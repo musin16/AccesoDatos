@@ -144,7 +144,7 @@ public class Modelo {
 		try (RandomAccessFile f = new RandomAccessFile(nombreFichero, "rw");) {
 			// Mueve el puntero al principio del archivo
 			f.seek(0);
-			while (f.getFilePointer() < f.length() && !resultado) {
+			while (buscarId(id2)) {
 				// Lee el ID del registro
 				int idd = f.readInt();
 				f.readUTF();
@@ -157,8 +157,10 @@ public class Modelo {
 					f.readBoolean();
 				}
 			}
-		} catch (IOException e) {
+		} catch (EOFException e) {
 			e.printStackTrace();
+		} catch (IOException e) {
+
 		}
 
 		return resultado;
@@ -166,42 +168,64 @@ public class Modelo {
 
 	public boolean borrarAsigPorId(int pedirid) {
 		boolean resultado = false;
-		try (RandomAccessFile f = new RandomAccessFile(nombreFichero, "r");
-				DataOutputStream d = new DataOutputStream(new FileOutputStream("asignaturas2.bin", true));) {
-			f.seek(0);
-			while (true) {
-				int id = f.readInt();
-				if (pedirid == id) {
-					f.readUTF();
-					f.readLong();
-					f.readFloat();
-					f.readBoolean();
+		if (buscarId(pedirid)) {
+			try (RandomAccessFile f = new RandomAccessFile(nombreFichero, "r");
+					DataOutputStream d = new DataOutputStream(new FileOutputStream("asignaturas2.bin", true));) {
+				f.seek(0);
+				while (true) {
+					int id = f.readInt();
+					if (pedirid == id) {
+						f.readUTF();
+						f.readLong();
+						f.readFloat();
+						f.readBoolean();
+					} else {
+						d.writeInt(id);
+						d.writeUTF(f.readUTF());
+						d.writeLong(f.readLong());
+						d.writeFloat(f.readFloat());
+						d.writeBoolean(f.readBoolean());
+					}
+				}
+			} catch (EOFException e) {
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				File archTemp = new File("asignaturas2.bin");
+				File ar = new File(nombreFichero);
+				if (ar.exists()) {
+					if (ar.delete()) {
+						System.out.println("Se ha borrado correctamente");
+						archTemp.renameTo(ar);
+					}
+
 				} else {
-					d.writeInt(id);
-					d.writeUTF(f.readUTF());
-					d.writeLong(f.readLong());
-					d.writeFloat(f.readFloat());
-					d.writeBoolean(f.readBoolean());
+					System.out.println("Fichero no existe");
 				}
-			}
-		} catch (EOFException e) {
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			File archTemp = new File("asignaturas2.bin");
-			File ar = new File(nombreFichero);
-			if (ar.exists()) {
-				if (ar.delete()) {
-					System.out.println("Se ha borrado correctamente");
-					archTemp.renameTo(ar);
-				}
-
-			} else {
-				System.out.println("Fichero no existe");
 			}
 		}
 		return resultado;
+	}
+
+	private boolean buscarId(int pedirid) {
+		try (RandomAccessFile ra = new RandomAccessFile(nombreFichero, "rw")) {
+			while (true) {
+				if (ra.readInt() == pedirid) {
+					return true;
+				}
+				ra.readUTF();
+				ra.readLong();
+				ra.readFloat();
+				ra.readBoolean();
+
+			}
+		} catch (EOFException e) {
+			System.out.println("No existe ninguna asignatura con ese id");
+		} catch (IOException e) {
+
+		}
+		return false;
 	}
 
 }

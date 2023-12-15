@@ -2,13 +2,13 @@ package ExamenMusin;
 
 public class Para {
 	private Mensajes mensajes;
-	private Empleados menEmpleados;
+	private int menEmpleados;
 	private int leido;
 
 	public Para() {
 	}
 
-	public Para(Mensajes mensajes, Empleados menEmpleados, int leido) {
+	public Para(Mensajes mensajes, int menEmpleados, int leido) {
 		this.mensajes = mensajes;
 		this.menEmpleados = menEmpleados;
 		this.leido = leido;
@@ -22,11 +22,11 @@ public class Para {
 		this.mensajes = mensajes;
 	}
 
-	public Empleados getMenEmpleados() {
+	public int getMenEmpleados() {
 		return menEmpleados;
 	}
 
-	public void setMenEmpleados(Empleados menEmpleados) {
+	public void setMenEmpleados(int menEmpleados) {
 		this.menEmpleados = menEmpleados;
 	}
 
@@ -40,7 +40,7 @@ public class Para {
 
 	@Override
 	public String toString() {
-		return "Para [mensajes=" + mensajes + ", menEmpleados=" + menEmpleados + ", leido=" + leido + "]";
+		return "Para [mensajes=" + mensajes.toString() + ", menEmpleados=" + menEmpleados + ", leido=" + leido + "]";
 	}
 
 }

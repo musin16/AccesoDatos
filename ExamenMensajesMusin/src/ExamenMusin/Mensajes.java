@@ -6,7 +6,7 @@ import java.util.Date;
 public class Mensajes {
 	private int id;
 	private Departamento deEmpleados;
-	private Empleados empleados;
+	private int paraempleados;
 	private String asunto;
 	private Date fechaEnvio;
 	private String mensaje;
@@ -14,11 +14,10 @@ public class Mensajes {
 	public Mensajes() {
 	}
 
-	public Mensajes(int id, Departamento deEmpleados, Empleados empleados, String asunto, Date fechaEnvio,
-			String mensaje) {
+	public Mensajes(int id, Departamento deEmpleados, int empleados, String asunto, Date fechaEnvio, String mensaje) {
 		this.id = id;
 		this.deEmpleados = deEmpleados;
-		this.empleados = empleados;
+		this.paraempleados = empleados;
 		this.asunto = asunto;
 		this.fechaEnvio = fechaEnvio;
 		this.mensaje = mensaje;
@@ -40,12 +39,12 @@ public class Mensajes {
 		this.deEmpleados = deEmpleados;
 	}
 
-	public Empleados getEmpleados() {
-		return empleados;
+	public int getEmpleados() {
+		return paraempleados;
 	}
 
-	public void setEmpleados(Empleados empleados) {
-		this.empleados = empleados;
+	public void setEmpleados(int empleados) {
+		this.paraempleados = empleados;
 	}
 
 	public String getAsunto() {
@@ -74,7 +73,7 @@ public class Mensajes {
 
 	@Override
 	public String toString() {
-		return "Para [id=" + id + ", deEmpleados=" + deEmpleados + ", empleados=" + empleados + ", asunto=" + asunto
+		return "Para [id=" + id + ", deEmpleados=" + deEmpleados + ", empleados=" + paraempleados + ", asunto=" + asunto
 				+ ", fechaEnvio=" + new SimpleDateFormat().format(fechaEnvio) + ", mensaje=" + mensaje + "]";
 	}
 }

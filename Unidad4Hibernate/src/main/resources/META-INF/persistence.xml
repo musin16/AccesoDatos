@@ -16,7 +16,7 @@ version="2.0">
 			
 			<!-- The database password -->
 			<property name="jakarta.persistence.jdbc.password" value="admindam"/>
-			<property name="hibernate.hbm2ddl.auto" value="update"/>
+			<property name="hibernate.hbm2ddl.auto" value="validate"/>
 		</properties>
 	</persistence-unit>
 </persistence>

@@ -8,6 +8,8 @@ import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -20,6 +22,7 @@ import jakarta.persistence.TemporalType;
 @Table(name = "reparacion")
 public class Reparacion {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	@Column(nullable = false)
 	@Temporal(TemporalType.DATE)
@@ -33,7 +36,7 @@ public class Reparacion {
 	@JoinColumn(name = "usuario", referencedColumnName = "id")
 	private Usuario usuario;
 
-	@Column(nullable = false)
+	@Column(nullable = true)
 	@Temporal(TemporalType.DATE)
 	private Date fechaPago;
 	@Column(nullable = true)
@@ -51,7 +54,6 @@ public class Reparacion {
 
 	public Reparacion(int id, Date fecha, Vehiculo vehiculo, Usuario usuario, Date fechaPago, float total, float horas,
 			float precioH) {
-		super();
 		this.id = id;
 		this.fecha = fecha;
 		this.vehiculo = vehiculo;

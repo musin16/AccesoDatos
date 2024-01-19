@@ -91,21 +91,28 @@ public class Principal {
 	}
 
 	private static void mostrarTicket(Reparacion r) {
-		// TODO Auto-generated method stub
-		ArrayList<Object[]> datos = bd.obtenerTicket(r);
-		System.out.println("Nombre del cliente:" + bd.obtenerVehiculo(r.getVehiculo()).getPropietario());
-		System.out.println("MAtrícula Vehículo" + r.getVehiculo());
+		System.out.println("Nombre del cliente:" + r.getVehiculo().getPropietario());
+		System.out.println("MAtrícula Vehículo" + r.getVehiculo().getMatricula());
 		System.out.println("Fecha Reparación:" + r.getFecha());
 		StringBuilder texto = new StringBuilder("Concepto");
 		texto.setLength(50);
 		System.out.println(texto + "\t\tCantidad\t\tPreciU\t\tTotal");
 		// Detalle del ticket
-		for (Object[] o : datos) {
-			texto = new StringBuilder(o[1].toString());
+		texto=new StringBuilder("Mano de obtra");
+		texto.setLength(50);
+		System.out.println(texto.toString() +
+				"\t\t" + r.getHoras() +
+				"\t\t" + r.getPrecioH() +
+				"\t\t" + r.getTotal());
+		for (PiezaReparacion pr : r.getPiezareparaciones()) {
+			texto=new StringBuilder(pr.getClave().getPieza().getNombre());
 			texto.setLength(50);
-			System.out
-					.println(o[0] + "\t\t" + texto.toString() + "\t\t" + o[2] + "\t\t" + ((float) o[1] * (float) o[2]));
+			System.out.println(texto.toString() +
+					"\t\t" + pr.getCantidad() +
+					"\t\t" + pr.getPrecio() +
+					"\t\t" + (pr.getCantidad()*pr.getPrecio()));
 		}
+
 		System.out.println("Total factura:" + r.getTotal());
 	}
 
@@ -284,14 +291,14 @@ public class Principal {
 		t.nextLine();
 		if (r != null && r.getFechaPago() == null) {
 			System.out.println("Horas invertidas");
-			float horas = t.nextFloat();
+			r.setHoras(t.nextFloat());
 			t.nextLine();
 			System.out.println("Precio Hora");
-			float precio = t.nextFloat();
+			r.setPrecioH(t.nextFloat());
 			t.nextLine();
-
-			if (bd.pagarReparacion(r, horas, precio)) {
+			if (bd.pagarReparacion(r)) {
 				System.out.println("Reparación pagada por " + r.getTotal() + " euros");
+				mostrarReparaciones();
 			}
 		} else {
 			System.out.println("Reparación no existe o ya está pagada");
@@ -324,7 +331,7 @@ public class Principal {
 
 		if (!error) {
 			// Crear reparación
-			Reparacion r = new Reparacion(0, new Date(), v,u);
+			Reparacion r = new Reparacion(0, new Date(), v, u);
 			if (bd.crearReparacion(r)) {
 				System.out.println("Reparación creada");
 			} else {

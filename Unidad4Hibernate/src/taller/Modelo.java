@@ -1,27 +1,13 @@
 package taller;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.SQLType;
-import java.sql.Statement;
-import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-
-import org.apache.commons.codec.digest.DigestUtils;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.Query;
-import jakarta.transaction.Transaction;
 
 public class Modelo {
 	private EntityManager conexion = null;
@@ -142,6 +128,7 @@ public class Modelo {
 			transaction.commit();
 			return true;
 		} catch (Exception e) {
+			transaction.rollback();
 			e.printStackTrace();
 		}
 		return false;
@@ -149,7 +136,7 @@ public class Modelo {
 
 	public Reparacion obtenerReparacion(int idR) {
 		try {
-			conexion.find(Reparacion.class, idR);
+			return conexion.find(Reparacion.class, idR);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -165,6 +152,25 @@ public class Modelo {
 			e.printStackTrace();
 		}
 		return resultado;
+	}
+
+	public boolean pagarReparacion(Reparacion r) {
+		EntityTransaction t = null;
+		try {
+			t = conexion.getTransaction();
+			t.begin();
+			r.setTotal(r.getHoras() * r.getPrecioH());
+			for (PiezaReparacion pr : r.getPiezareparaciones()) {
+				r.setTotal(r.getTotal()+pr.getCantidad()*pr.getPrecio());
+			}
+			r.setFechaPago(new Date());
+			t.commit();
+			return true;
+		} catch (Exception e) {
+			t.rollback();
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 }

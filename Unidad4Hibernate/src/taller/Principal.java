@@ -64,6 +64,9 @@ public class Principal {
 			case 1:
 				verReparaciones();
 				break;
+			case 2:
+				crearUsuario();
+				break;
 			}
 
 		} while (opcion != 0);
@@ -76,17 +79,14 @@ public class Principal {
 			System.out.println(re);
 		}
 		System.out.println("Introdce código de reparación:");
-		Reparacion re = bd.obtenerReparacion(t.nextInt());
+		int id = t.nextInt();
 		t.nextLine();
 		// Si la reparación es del usuario logueado y está pagada, mostramos detalles
-		if (bd.obtenerVehiculo(re.getVehiculo()).getPropietario().equalsIgnoreCase(u.getUsuario())) {
-			if (re.getFechaPago() != null) {
-				mostrarTicket(re);
-			} else {
-				System.out.println("La reparación no está pagada. No se puede mostrar el detalle");
+		for (Reparacion reparacion : r) {
+			if (reparacion.getFechaPago() != null && reparacion.getId() == id) {
+				mostrarTicket(reparacion);
+				break;
 			}
-		} else {
-			System.out.println("La reparación no existe");
 		}
 	}
 
@@ -98,19 +98,14 @@ public class Principal {
 		texto.setLength(50);
 		System.out.println(texto + "\t\tCantidad\t\tPreciU\t\tTotal");
 		// Detalle del ticket
-		texto=new StringBuilder("Mano de obtra");
+		texto = new StringBuilder("Mano de obtra");
 		texto.setLength(50);
-		System.out.println(texto.toString() +
-				"\t\t" + r.getHoras() +
-				"\t\t" + r.getPrecioH() +
-				"\t\t" + r.getTotal());
+		System.out.println(texto.toString() + "\t\t" + r.getHoras() + "\t\t" + r.getPrecioH() + "\t\t" + r.getTotal());
 		for (PiezaReparacion pr : r.getPiezareparaciones()) {
-			texto=new StringBuilder(pr.getClave().getPieza().getNombre());
+			texto = new StringBuilder(pr.getClave().getPieza().getNombre());
 			texto.setLength(50);
-			System.out.println(texto.toString() +
-					"\t\t" + pr.getCantidad() +
-					"\t\t" + pr.getPrecio() +
-					"\t\t" + (pr.getCantidad()*pr.getPrecio()));
+			System.out.println(texto.toString() + "\t\t" + pr.getCantidad() + "\t\t" + pr.getPrecio() + "\t\t"
+					+ (pr.getCantidad() * pr.getPrecio()));
 		}
 
 		System.out.println("Total factura:" + r.getTotal());
@@ -146,7 +141,7 @@ public class Principal {
 		System.out.println("Introduce código de reparación");
 		Reparacion r = bd.obtenerReparacion(t.nextInt());
 		t.nextLine();
-		if (r != null) {
+		if (r != null && r.getFechaPago() == null) {
 			String salir = "";
 			do {
 				mostrarPiezas();
@@ -160,26 +155,27 @@ public class Principal {
 					// Chequear si hay stock
 					if (p.getStock() >= cantidad) {
 						// Añadir pieza a reparación
-						PiezaReparacion pr = bd.obtenerPiezaRep(r, p);
-						if (pr == null) {
-							// insertar
-							if (cantidad >= 0) {
-								pr = new PiezaReparacion(r.getId(), p.getId(), cantidad, p.getPrecio());
-								if (bd.insertarPiezaReparacion(pr)) {
-									System.out.println("Pieza añadida");
-								} else {
-									System.out.println("Error al añadir pieza");
-								}
-							} else {
-								System.out.println("La cantidad no puede ser negativa");
+						// Buscar en el arrayÑist de pr de reparacion
+						// y SI LA PIEZA EXISTE,SE AÑADE CANTIDAD Y
+						// SI NO SE AÑADE UN PR AL ARRAYLIST
+						boolean existe = false;
+						for (PiezaReparacion pr : r.getPiezareparaciones()) {
+							if (pr.getClave().getPieza().getId() == p.getId()) {
+								existe = true;
+								pr.setCantidad(pr.getCantidad() - cantidad);
+								pr.getClave().getPieza().setStock(pr.getClave().getPieza().getStock() - cantidad);
+								break;
 							}
+						}
+						if (!existe) {
+							// Añadir pr al arraylist de pr en repracion
+							r.getPiezareparaciones()
+									.add(new PiezaReparacion(new ClavePiezaReparacion(r, p), cantidad, p.getPrecio()));
+						}
+						if (bd.modificar()) {
+							System.out.println("Se ha modificado correctamente");
 						} else {
-							// modificar
-							if (bd.modificarCantidad(pr, cantidad)) {
-								System.out.println("Pieza modificada");
-							} else {
-								System.out.println("Error al modificar pieza");
-							}
+							System.out.println("Error al modificar ");
 						}
 					} else {
 						System.out.println("Error, stock insuficiente");
@@ -351,8 +347,8 @@ public class Principal {
 	private static void cambiarPS() {
 		// TODO Auto-generated method stub
 		System.out.println("Nueva Contraseña:");
-		String ps = t.nextLine();
-		if (bd.cambiarPS(u, ps)) {
+		u.setPs(DigestUtils.sha512Hex(t.nextLine()));
+		if (bd.cambiarPs(u)) {
 			System.out.println("Contraseña cambiada");
 		} else {
 			System.out.println("Error al cambiar contraseña");

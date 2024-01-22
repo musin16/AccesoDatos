@@ -161,7 +161,7 @@ public class Modelo {
 			t.begin();
 			r.setTotal(r.getHoras() * r.getPrecioH());
 			for (PiezaReparacion pr : r.getPiezareparaciones()) {
-				r.setTotal(r.getTotal()+pr.getCantidad()*pr.getPrecio());
+				r.setTotal(r.getTotal() + pr.getCantidad() * pr.getPrecio());
 			}
 			r.setFechaPago(new Date());
 			t.commit();
@@ -173,4 +173,70 @@ public class Modelo {
 		return false;
 	}
 
+	public ArrayList<Object[]> obtenerVentasMes(int id) {
+		try {
+			Query q = conexion.createQuery("FROM Reparacion WHERE ");
+			return (ArrayList<Object[]>) q.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public Pieza obtenerPieza(int idPieza) {
+		try {
+			return conexion.find(Pieza.class, idPieza);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public ArrayList<Pieza> obtenerPiezas() {
+		try {
+			Query q = conexion.createQuery("from Pieza");
+			return (ArrayList<Pieza>) q.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new ArrayList<Pieza>();
+	}
+
+	public boolean modificar() {
+		EntityTransaction t = null;
+		try {
+			t = conexion.getTransaction();
+			t.begin();
+			t.commit();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public boolean cambiarPs(Usuario u) {
+		EntityTransaction t = null;
+		try {
+			t = conexion.getTransaction();
+			t.begin();
+			t.commit();
+			conexion.clear();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public ArrayList<Reparacion> obtenerReparaciones(String usuario) {
+		try {
+			Query e = conexion.createQuery("FROM Reparacion where vehiculo.propietario=?1");
+			e.setParameter(1, usuario);
+			return (ArrayList<Reparacion>) e.getResultList();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new ArrayList<Reparacion>();
+	}
 }
